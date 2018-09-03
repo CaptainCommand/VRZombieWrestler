@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ZombieFiniteStateMachine
+public class ZombieFiniteStateMachine : MonoBehaviour
 {
     // Keeps track of the zombie's current state.
     private ZombieState zombieState;
@@ -14,10 +14,9 @@ public class ZombieFiniteStateMachine
     public ZombieBehaviorDelegate RagdollDelegate;
 
     // Use this for initialization
-    public ZombieFiniteStateMachine()
+    void Start()
     {
         zombieState = ZombieState.IDLE;
-
     }
 
     public void Transition(ZombieState newState)
@@ -33,7 +32,7 @@ public class ZombieFiniteStateMachine
                 IdleDelegate();
                 break;
             case ZombieState.ATTACK:
-                IdleDelegate();
+                AttackDelegate();
                 break;
             case ZombieState.RAGDOLL:
                 RagdollDelegate();
