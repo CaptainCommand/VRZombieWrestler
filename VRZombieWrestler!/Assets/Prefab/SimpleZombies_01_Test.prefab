@@ -1234,6 +1234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthMax: 100
+  healthCurrent: 0
 --- !u!135 &135803785345679230
 SphereCollider:
   m_ObjectHideFlags: 1
