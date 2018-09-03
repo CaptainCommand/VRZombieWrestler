@@ -42,7 +42,7 @@ public class OVRGrabbable : MonoBehaviour
     protected Collider m_grabbedCollider = null;
     protected OVRGrabber m_grabbedBy = null;
 
-    public int grapplePointsTotal = 0;
+    //public int grapplePointsTotal = 0;
 
 	/// <summary>
 	/// If true, the object can currently be grabbed.
@@ -63,7 +63,7 @@ public class OVRGrabbable : MonoBehaviour
         }
         set
         {
-            grappleTotal += 1;
+            //grappleTotal += 1;
         }
     }
 
