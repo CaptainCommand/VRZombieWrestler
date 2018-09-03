@@ -5,16 +5,16 @@ using UnityEngine;
 public class ZombieSpawner : MonoBehaviour
 {
     // Player position
-    public Vector3 playerPosition;
+    public GameObject player;
 
     // List of possible zombie types.
     public List<GameObject> zombieTypes;
 
     // List of zombies currently spawned.
-    private List<GameObject> zombies;
+    public List<GameObject> zombies;
 
     // List of the spawn points for the zombies;
-    public List<Vector3> spawnPoints;
+    public List<GameObject> spawnPoints;
     private System.Random spawnPointChooser;
 
     // Game level limits the types of zombies, as well as the max that can attack at the same time.
@@ -22,7 +22,9 @@ public class ZombieSpawner : MonoBehaviour
 
     // Maximum number of zombies that can exist at the same time.
     public int zombieMaxSpawnCount;
-    public int zombieMaxAttackCount;
+
+    // Maximum number of zombies active at the same time.
+    public int zombieMaxActiveCount;
 
     // Timer delay for spawning
     public float spawnDelaySeconds;
@@ -58,29 +60,32 @@ public class ZombieSpawner : MonoBehaviour
             {
                 GameObject zombieDying = zombies[index];
                 zombies.RemoveAt(index);
+                // TODO: Replace with effect or animation before destroy.
                 Destroy(zombieDying);
             }
         }
 
-        // Spawn a zombie is we are under the max number.
+        // Spawn a zombie if we are under the max number.
         if (zombies.Count < zombieMaxSpawnCount)
         {
             // The next zombie type to spawn will be chosen randomly from the list,
             // where the list is limited by the game level;
-            int zombieTypeMax = ((gameLevel + 1) < (zombieTypes.Count - 1)) ? (zombieTypes.Count - 1) : (gameLevel + 1);
+            int zombieTypeMax = ((gameLevel) <= (zombieTypes.Count - 1)) ? (gameLevel) : (zombieTypes.Count - 1);
             int zombieType = zombieChooser.Next(0, zombieTypeMax);
 
             // Choose spawn point randomly.
             int spawnPoint = spawnPointChooser.Next(0, spawnPoints.Count - 1);
 
             // Spawn the zombie and add to the list.
-            zombies.Add(Instantiate(zombieTypes[zombieType], spawnPoints[spawnPoint], Quaternion.LookRotation(playerPosition - spawnPoints[spawnPoint])));
+            zombies.Add(Instantiate(zombieTypes[zombieType], spawnPoints[spawnPoint].transform.position,
+                Quaternion.LookRotation(player.transform.position - spawnPoints[spawnPoint].transform.position)));
+            zombies[zombies.Count - 1].GetComponent<Zombie>().player = player;
         }
 
-        // Set the first four zombies in the list as active
+        // Set the first zombies in the list as active
         for (int index = 0; index < zombies.Count; index++)
         {
-            if (index < zombieMaxAttackCount)
+            if (index < zombieMaxActiveCount)
             {
                 // If the zombie is currently idle, set it to active.
                 if (zombies[index].GetComponent<Zombie>().zombieFSM.GetState() == ZombieState.IDLE)

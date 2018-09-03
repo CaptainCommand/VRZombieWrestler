@@ -2,6 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * This class keeps track of all of the required information for a zombie.
+ * It requires the following scripts to be attached to the same GameObject:
+ * Health.cs
+ * ZombieFiniteStateMachine.cs
+ * It requires the following components in the GameObject:
+ * NavMeshAgent
+ * Animator
+ * Collider (for attack area)
+ * Trigger Collider (for damage hitbox during ragdoll)
+ * In addition, for the ragdoll, this GameObject must also utilize
+ * the OVRGrabbable.cs script on any parts that can be grabbed.
+ * Those parts must also be dragged into the list of grabbable objects.
+ */
 public class Zombie : MonoBehaviour
 {
     // Zombie health attributes
@@ -24,6 +38,7 @@ public class Zombie : MonoBehaviour
     public ZombieFiniteStateMachine zombieFSM;
     public List<GameObject> grabbableObjects;
     private List<OVRGrabbable> ovrGrabbables;
+    private int grabCount;
     private Animator animator;
 
     // Use this for initialization
@@ -38,7 +53,7 @@ public class Zombie : MonoBehaviour
         navMeshAgent.speed = baseSpeed;
         navMeshAgent.acceleration = acceleration;
         // Stop at a distance where it is still possible to attack.
-        navMeshAgent.stoppingDistance = attackRange * 0.8f;
+        navMeshAgent.stoppingDistance = attackRange * 0.5f;
 
         // Set up the finite state machine
         zombieFSM = GetComponent<ZombieFiniteStateMachine>();
@@ -59,34 +74,38 @@ public class Zombie : MonoBehaviour
         zombieFSM.AttackDelegate += DisableNavigation;
         zombieFSM.AttackDelegate += Attack;
 
+        zombieFSM.Transition(ZombieState.IDLE);
+
         // Retrive all of the ovrGrabbable objects
         // from each of the grababble game objects in the list.
+        ovrGrabbables = new List<OVRGrabbable>();
         foreach (GameObject gameObject in grabbableObjects)
         {
             ovrGrabbables.Add(gameObject.GetComponent<OVRGrabbable>());
         }
+        grabCount = 0;
 
         // Get the animator component.
         animator = GetComponent<Animator>();
-    }
-
-    void Awake()
-    {
-        zombieFSM.Transition(ZombieState.IDLE);
     }
 
     // Update is called once per frame
     void Update()
     {
         // Loop over the set of grabbable objects
-        // Check to see is any is being grappled.
+        // Check to see is any is being grappled by two points.
         // If so, then ragdoll.
+        grabCount = 0;
         foreach (OVRGrabbable ovrGrabbable in ovrGrabbables)
         {
             if (ovrGrabbable.isGrabbed)
             {
-                zombieFSM.Transition(ZombieState.RAGDOLL);
+                ++grabCount;
             }
+        }
+        if (grabCount >= 2)
+        {
+            zombieFSM.Transition(ZombieState.RAGDOLL);
         }
     }
 
@@ -107,50 +126,59 @@ public class Zombie : MonoBehaviour
     // Use a normal collider for the attack hurtbox
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (zombieFSM.currentState != ZombieState.RAGDOLL)
         {
-            zombieFSM.Transition(ZombieState.ATTACK);
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                zombieFSM.Transition(ZombieState.ATTACK);
+            }
         }
     }
 
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (zombieFSM.currentState != ZombieState.RAGDOLL)
         {
-            zombieFSM.Transition(ZombieState.IDLE);
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                zombieFSM.Transition(ZombieState.IDLE);
+            }
         }
     }
 
     // Use a trigger collider for ragdoll collisions
     void OnTriggerEnter(Collider other)
     {
-        // Takes damage from the environment.
-        if (other.CompareTag("Environment"))
+        if (zombieFSM.currentState == ZombieState.RAGDOLL)
         {
-            health.TakeDamage(damage);
-            // Check for dead state.
-            if (health.isDead)
+            // Takes damage from the environment.
+            if (other.CompareTag("Environment"))
             {
-                zombieFSM.Transition(ZombieState.RAGDOLL);
+                health.TakeDamage(damage);
+                // Check for dead state.
+                if (health.isDead)
+                {
+                    zombieFSM.Transition(ZombieState.RAGDOLL);
+                }
+                else
+                {
+                    zombieFSM.Transition(ZombieState.IDLE);
+                }
             }
-            else
+            // Damages both the zombie and the zombie it hits.
+            else if (other.CompareTag("Zombie"))
             {
-                zombieFSM.Transition(ZombieState.IDLE);
-            }
-        }
-        // Damages both the zombie and the zombie it hits.
-        else if (other.CompareTag("Zombie"))
-        {
-            health.TakeDamage(damage);
-            other.GetComponent<Zombie>().health.TakeDamage(damage);
-            // Check for dead state.
-            if (health.isDead)
-            {
-                zombieFSM.Transition(ZombieState.RAGDOLL);
-            }
-            else
-            {
-                zombieFSM.Transition(ZombieState.IDLE);
+                health.TakeDamage(damage);
+                other.GetComponent<Zombie>().health.TakeDamage(damage);
+                // Check for dead state.
+                if (health.isDead)
+                {
+                    zombieFSM.Transition(ZombieState.RAGDOLL);
+                }
+                else
+                {
+                    zombieFSM.Transition(ZombieState.IDLE);
+                }
             }
         }
     }
@@ -172,13 +200,14 @@ public class Zombie : MonoBehaviour
     // Enables ragdoll mode.
     public void EnableRagdoll()
     {
-
+        animator.enabled = false;
     }
 
     // Disables ragdoll mode.
     public void DisableRagdoll()
     {
-
+        // TODO: animator snaps back too quickly, consider advanced transition and Mechanims
+        animator.enabled = true;
     }
 
     public void Attack()
@@ -189,7 +218,7 @@ public class Zombie : MonoBehaviour
 
     public void StopAttack()
     {
-        isAttacking = false;
         StopCoroutine(AttackCoroutine());
+        isAttacking = false;
     }
 }

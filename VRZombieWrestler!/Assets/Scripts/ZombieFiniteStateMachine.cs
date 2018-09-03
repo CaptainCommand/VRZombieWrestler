@@ -40,9 +40,12 @@ public class ZombieFiniteStateMachine : MonoBehaviour
         }
     }
 
-    public ZombieState GetState()
+    public ZombieState currentState
     {
-        return zombieState;
+        get
+        {
+            return zombieState;
+        }
     }
 }
 
