@@ -37,16 +37,21 @@ public class Zombie : MonoBehaviour
 
     public ZombieFiniteStateMachine zombieFSM;
     public List<GameObject> grabbableObjects;
-    private List<OVRGrabbable> ovrGrabbables;
+    public List<OVRGrabbable> ovrGrabbables;
     private int grabCount;
     private Animator animator;
 
     // Use this for initialization
     void Start()
     {
+
         // Initialize health
         health = GetComponent<Health>();
         isAttacking = false;
+
+        // Get the animator component.
+        animator = GetComponent<Animator>();
+
 
         // Set the nav mesh agent parameters.
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -85,8 +90,6 @@ public class Zombie : MonoBehaviour
         }
         grabCount = 0;
 
-        // Get the animator component.
-        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
