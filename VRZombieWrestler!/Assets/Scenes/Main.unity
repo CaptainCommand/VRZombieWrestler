@@ -2598,6 +2598,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100008, guid: ce816f2e6abb0504092c23ed9b970dfd,
     type: 2}
   m_PrefabInternal: {fileID: 892130648}
+--- !u!114 &2021318754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2021318753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686b519c3bedb934dae9b90b847e35bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerHealth: 6
 --- !u!1 &2027612939 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 180216, guid: 0370ef2c25601f44b82fdadb9df62dd8,
