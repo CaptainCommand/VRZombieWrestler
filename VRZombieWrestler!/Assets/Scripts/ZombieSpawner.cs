@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * This class will spawn zombies randomly among the spawn points
+ * specified. It also randomizes zombie types among a given set of types.
+ * It only allows a maximum number of zombie spawns, and only a set
+ * amount of those zombies are active at any given time.
+ */
 public class ZombieSpawner : MonoBehaviour
 {
     // Player position
@@ -19,6 +25,12 @@ public class ZombieSpawner : MonoBehaviour
 
     // Game level limits the types of zombies, as well as the max that can attack at the same time.
     private int gameLevel;
+
+    // This determines the number of zombie kills that will increase the level.
+    public int zombieScorePerLevel;
+
+    // This is the total number of zombies killed so far.
+    public int zombieScore;
 
     // Maximum number of zombies that can exist at the same time.
     public int zombieMaxSpawnCount;
@@ -38,6 +50,7 @@ public class ZombieSpawner : MonoBehaviour
         zombies = new List<GameObject>();
 
         gameLevel = 0;
+        zombieScore = 0;
         zombieChooser = new System.Random();
         spawnPointChooser = new System.Random();
 
@@ -62,6 +75,7 @@ public class ZombieSpawner : MonoBehaviour
                 zombies.RemoveAt(index);
                 // TODO: Replace with effect or animation before destroy.
                 Destroy(zombieDying);
+                zombieScore++;
             }
         }
 
@@ -88,7 +102,7 @@ public class ZombieSpawner : MonoBehaviour
             if (index < zombieMaxActiveCount)
             {
                 // If the zombie is currently idle, set it to active.
-                if (zombies[index].GetComponent<Zombie>().zombieFSM.GetState() == ZombieState.IDLE)
+                if (zombies[index].GetComponent<Zombie>().zombieFSM.currentState == ZombieState.IDLE)
                 {
                     zombies[index].GetComponent<Zombie>().zombieFSM.Transition(ZombieState.ACTIVE);
                 }

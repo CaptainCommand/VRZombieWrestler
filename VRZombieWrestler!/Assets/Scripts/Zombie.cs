@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/*
+/**
  * This class keeps track of all of the required information for a zombie.
  * It requires the following scripts to be attached to the same GameObject:
  * Health.cs
  * ZombieFiniteStateMachine.cs
+ * OVRGrabbable.cs
  * It requires the following components in the GameObject:
  * NavMeshAgent
  * Animator
  * Collider (for attack area)
  * Trigger Collider (for damage hitbox during ragdoll)
- * In addition, for the ragdoll, this GameObject must also utilize
- * the OVRGrabbable.cs script on any parts that can be grabbed.
- * Those parts must also be dragged into the list of grabbable objects.
  */
 public class Zombie : MonoBehaviour
 {
@@ -36,14 +34,15 @@ public class Zombie : MonoBehaviour
     public float attackCooldown;
 
     public ZombieFiniteStateMachine zombieFSM;
-    public List<GameObject> grabbableObjects;
-    private List<OVRGrabbable> ovrGrabbables;
-    private int grabCount;
+    private OVRGrabbable ovrGrabbable;
     private Animator animator;
 
     // Use this for initialization
     void Start()
     {
+        // Get the animator component.
+        animator = GetComponent<Animator>();
+
         // Initialize health
         health = GetComponent<Health>();
         isAttacking = false;
@@ -61,49 +60,40 @@ public class Zombie : MonoBehaviour
         zombieFSM.IdleDelegate += DisableRagdoll;
         zombieFSM.IdleDelegate += StopAttack;
         zombieFSM.IdleDelegate += DisableNavigation;
+        zombieFSM.IdleDelegate += EnableIdle;
         // Actions for ragdoll state.
         zombieFSM.RagdollDelegate += StopAttack;
         zombieFSM.RagdollDelegate += DisableNavigation;
+        zombieFSM.RagdollDelegate += DisableIdle;
         zombieFSM.RagdollDelegate += EnableRagdoll;
         // Actions for active state.
         zombieFSM.ActiveDelegate += DisableRagdoll;
         zombieFSM.ActiveDelegate += StopAttack;
+        zombieFSM.ActiveDelegate += DisableIdle;
         zombieFSM.ActiveDelegate += EnableNavigation;
         // Actions for attacking state.
         zombieFSM.AttackDelegate += DisableRagdoll;
         zombieFSM.AttackDelegate += DisableNavigation;
+        zombieFSM.AttackDelegate += DisableIdle;
         zombieFSM.AttackDelegate += Attack;
-
+        // Default state is idle.
         zombieFSM.Transition(ZombieState.IDLE);
 
-        // Retrive all of the ovrGrabbable objects
-        // from each of the grababble game objects in the list.
-        ovrGrabbables = new List<OVRGrabbable>();
-        foreach (GameObject gameObject in grabbableObjects)
-        {
-            ovrGrabbables.Add(gameObject.GetComponent<OVRGrabbable>());
-        }
-        grabCount = 0;
+        // Retrieve the grabbable objects.
+        ovrGrabbable = GetComponent<OVRGrabbable>();
 
-        // Get the animator component.
-        animator = GetComponent<Animator>();
+        // Set all parts of the Zombie to be kinematic to start.
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Loop over the set of grabbable objects
-        // Check to see is any is being grappled by two points.
-        // If so, then ragdoll.
-        grabCount = 0;
-        foreach (OVRGrabbable ovrGrabbable in ovrGrabbables)
-        {
-            if (ovrGrabbable.isGrabbed)
-            {
-                ++grabCount;
-            }
-        }
-        if (grabCount >= 2)
+        // Check to see if the object has been grabbed,
+        if (ovrGrabbable.isGrabbed)
         {
             zombieFSM.Transition(ZombieState.RAGDOLL);
         }
@@ -183,30 +173,51 @@ public class Zombie : MonoBehaviour
         }
     }
 
+    public void EnableIdle()
+    {
+        animator.SetBool("isIdle", true);
+    }
+
+    public void DisableIdle()
+    {
+        animator.SetBool("isIdle", false);
+    }
+
     // Enables navigation.
     public void EnableNavigation()
     {
         navMeshAgent.enabled = true;
         navMeshAgent.SetDestination(player.transform.position);
         transform.LookAt(player.transform.position);
+        animator.SetBool("isActive", true);
     }
 
     // Disables navigation.
     public void DisableNavigation()
     {
         navMeshAgent.enabled = false;
+        animator.SetBool("isActive", false);
     }
 
     // Enables ragdoll mode.
     public void EnableRagdoll()
     {
+        // Zombie must not be kinematic for ragdoll mode.
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
         animator.enabled = false;
     }
 
     // Disables ragdoll mode.
     public void DisableRagdoll()
     {
-        // TODO: animator snaps back too quickly, consider advanced transition and Mechanims
+        // Set all parts of the Zombie to be kinematic for animator.
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
         animator.enabled = true;
     }
 
@@ -214,11 +225,13 @@ public class Zombie : MonoBehaviour
     {
         isAttacking = true;
         StartCoroutine(AttackCoroutine());
+        animator.SetBool("isAttacking", true);
     }
 
     public void StopAttack()
     {
         StopCoroutine(AttackCoroutine());
         isAttacking = false;
+        animator.SetBool("isAttacking", false);
     }
 }
