@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * This class allows for the zombie's behavior to change
+ * according to the current state of the zombie.
+ * A script that implements this FSM must create and add
+ * valid delegates to each state's delegate, so that
+ * the proper actions are enabled.
+ */
 public class ZombieFiniteStateMachine : MonoBehaviour
 {
     // Keeps track of the zombie's current state.

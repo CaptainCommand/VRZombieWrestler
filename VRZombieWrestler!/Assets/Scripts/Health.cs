@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// This class can go on both players and enemies.
+/**
+ * This class keeps track of health. This can be attached
+ * to both the players and enemies.
+ */
 public class Health : MonoBehaviour
 {
     public float healthMax;
