@@ -34,23 +34,15 @@ public class Zombie : MonoBehaviour
     public float attackCooldown;
 
     public ZombieFiniteStateMachine zombieFSM;
-<<<<<<< HEAD
-    public List<GameObject> grabbableObjects;
-    public List<OVRGrabbable> ovrGrabbables;
-    private int grabCount;
-=======
+
     private OVRGrabbable ovrGrabbable;
->>>>>>> 256babac2b57113d320e46af140cf9905dc8e65b
     private Animator animator;
 
     // Use this for initialization
     void Start()
     {
-<<<<<<< HEAD
-=======
         // Get the animator component.
         animator = GetComponent<Animator>();
->>>>>>> 256babac2b57113d320e46af140cf9905dc8e65b
 
         // Initialize health
         health = GetComponent<Health>();
@@ -58,7 +50,11 @@ public class Zombie : MonoBehaviour
 
         // Get the animator component.
         animator = GetComponent<Animator>();
-
+        // Set all parts of the Zombie to be kinematic to start.
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
 
         // Set the nav mesh agent parameters.
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -94,17 +90,6 @@ public class Zombie : MonoBehaviour
 
         // Retrieve the grabbable objects.
         ovrGrabbable = GetComponent<OVRGrabbable>();
-
-        // Set all parts of the Zombie to be kinematic to start.
-        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
-        {
-            rb.isKinematic = true;
-        }
-<<<<<<< HEAD
-        grabCount = 0;
-
-=======
->>>>>>> 256babac2b57113d320e46af140cf9905dc8e65b
     }
 
     // Update is called once per frame

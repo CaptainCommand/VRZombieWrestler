@@ -1221,7 +1221,8 @@ MonoBehaviour:
   damage: 10
   attackCooldown: 2
   zombieFSM: {fileID: 0}
-  ovrGrabbable: {fileID: 0}
+  grabbableObjects: []
+  ovrGrabbables: []
 --- !u!114 &114185678171361240
 MonoBehaviour:
   m_ObjectHideFlags: 1

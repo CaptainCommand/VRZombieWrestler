@@ -101,13 +101,11 @@ public class ZombieSpawner : MonoBehaviour
         {
             if (index < zombieMaxActiveCount)
             {
-                /*
                 // If the zombie is currently idle, set it to active.
                 if (zombies[index].GetComponent<Zombie>().zombieFSM.currentState == ZombieState.IDLE)
                 {
                     zombies[index].GetComponent<Zombie>().zombieFSM.Transition(ZombieState.ACTIVE);
                 }
-                */
             }
         }
     }
