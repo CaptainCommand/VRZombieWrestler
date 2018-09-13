@@ -30,6 +30,9 @@ public class ZombieSpawner : MonoBehaviour
     public int zombieScorePerLevel;
 
     // This is the total number of zombies killed so far.
+    public int totalScore;
+
+    // This is the current number of zombies killed in a difficulty level.
     public int zombieScore;
 
     // Maximum number of zombies that can exist at the same time.
@@ -63,6 +66,19 @@ public class ZombieSpawner : MonoBehaviour
 
     }
 
+    // Increases the max number of zombies spawned as well as the level.
+    void LevelUp()
+    {
+        if (zombieScore >= zombieScorePerLevel)
+        {
+            // Reset current zombie score for the level.
+            zombieScore = 0;
+            gameLevel++;
+            zombieMaxSpawnCount++;
+            zombieMaxActiveCount++;
+        }
+    }
+
     void SpawnZombie()
     {
         // Remove any dead zombies from the scene
@@ -75,7 +91,10 @@ public class ZombieSpawner : MonoBehaviour
                 zombies.RemoveAt(index);
                 // TODO: Replace with effect or animation before destroy.
                 Destroy(zombieDying);
+                totalScore++;
                 zombieScore++;
+                // Increase difficulty level
+                LevelUp();
             }
         }
 
