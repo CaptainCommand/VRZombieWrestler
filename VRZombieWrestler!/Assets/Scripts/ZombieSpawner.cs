@@ -60,7 +60,7 @@ public class ZombieSpawner : MonoBehaviour
         zombieChooser = new System.Random();
         spawnPointChooser = new System.Random();
 
-        GameStart();
+        // GameStart(); Debug only.
     }
 
     public void GameStart()
