@@ -17,7 +17,7 @@ public class ZombieSpawner : MonoBehaviour
     public List<GameObject> zombieTypes;
 
     // List of zombies currently spawned.
-    public List<GameObject> zombies;
+    private List<GameObject> zombies;
 
     // List of the spawn points for the zombies;
     public List<GameObject> spawnPoints;
@@ -33,7 +33,7 @@ public class ZombieSpawner : MonoBehaviour
     public int totalScore;
 
     // This is the current number of zombies killed in a difficulty level.
-    public int zombieScore;
+    private int zombieScore;
 
     // Maximum number of zombies that can exist at the same time.
     public int zombieMaxSpawnCount;
