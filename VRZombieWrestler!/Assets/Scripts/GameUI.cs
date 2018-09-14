@@ -9,9 +9,10 @@ public class GameUI : MonoBehaviour {
     public Text scoreText;
     public GameObject startMenu;
     public GameObject gameOver;
+    public ZombieSpawner zombieSpawner;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         startMenu.SetActive(true);
         gameOver.SetActive(false);
 	}
@@ -29,5 +30,16 @@ public class GameUI : MonoBehaviour {
             gameOver.SetActive(true);
         }
 
+    }
+
+    public void StartGame()
+    {
+        zombieSpawner.GameStart();
+        startMenu.SetActive(false);
+    }
+
+    public void Retire()
+    {
+        Application.Quit();
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   - component: {fileID: 420266}
   - component: {fileID: 19886758}
   - component: {fileID: 19954650}
+  - component: {fileID: 114494711721194980}
   m_Layer: 0
   m_Name: FX_BloodSplatter
   m_TagString: Untagged
@@ -49,7 +50,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 1
+    scalar: 0
     minScalar: 1
     maxCurve:
       serializedVersion: 2
@@ -525,7 +526,7 @@ ParticleSystem:
     startRotation:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.87266463
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -1496,8 +1497,8 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0
-      minScalar: 0
+      scalar: 30
+      minScalar: 5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1531,8 +1532,8 @@ ParticleSystem:
     z:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0
-      minScalar: 0
+      scalar: 30
+      minScalar: 5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4562,3 +4563,14 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 194062}
   m_IsPrefabAsset: 1
+--- !u!114 &114494711721194980
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 194062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066d947e074c7214191d47b2f428eb61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

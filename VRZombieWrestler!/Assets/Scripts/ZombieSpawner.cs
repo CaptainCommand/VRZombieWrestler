@@ -59,6 +59,8 @@ public class ZombieSpawner : MonoBehaviour
         zombieScore = 0;
         zombieChooser = new System.Random();
         spawnPointChooser = new System.Random();
+
+        GameStart();
     }
 
     public void GameStart()
@@ -88,36 +90,23 @@ public class ZombieSpawner : MonoBehaviour
     void DestroyZombies()
     {
         // Remove any dead zombies from the scene
-        zombies.RemoveAll(zombie => zombie.GetComponent<Health>().isDead == true);
         for (int index = zombies.Count - 1; index >= 0; index--)
         {
             if (zombies[index].GetComponent<Health>().isDead)
             {
-                GameObject zombieDying = zombies[index];
+                // Create a blood splatter effect.
+                Instantiate<ParticleSystem>(bloodExplosion,
+                    zombies[index].transform.position, zombies[index].transform.rotation);
+                // Destroy the zombie and remove from the list.
+                Destroy(zombies[index]);
                 zombies.RemoveAt(index);
-                // TODO: Replace with effect or animation before destroy.
-                // StartCoroutine(DestroyZombieCoroutine(zombieDying));
-                Destroy(zombieDying);
+                
                 totalScore++;
                 zombieScore++;
-                // Increase difficulty level
+                // Check to increase difficulty level.
                 LevelUp();
             }
         }
-    }
-
-    IEnumerator DestroyZombieCoroutine(GameObject zombieDestroy)
-    {
-        ParticleSystem ps = Instantiate<ParticleSystem>(bloodExplosion, zombieDestroy.transform);
-        // If the zombie is currently attacking.
-        for (float time = 0; time < 5.0f; time++)
-        {
-            yield return new WaitForSeconds(1.0f);
-        }
-        Destroy(ps);
-        Destroy(zombieDestroy);
-
-        yield break;
     }
 
     void SpawnZombie()
@@ -128,10 +117,8 @@ public class ZombieSpawner : MonoBehaviour
         // Spawn a zombie if we are under the max number.
         if (zombies.Count < zombieMaxSpawnCount)
         {
-            // The next zombie type to spawn will be chosen randomly from the list,
-            // where the list is limited by the game level;
-            int zombieTypeMax = ((gameLevel) <= (zombieTypes.Count - 1)) ? (gameLevel) : (zombieTypes.Count - 1);
-            int zombieType = zombieChooser.Next(0, zombieTypeMax);
+            // The next zombie type to spawn will be chosen randomly from the list.
+            int zombieType = zombieChooser.Next(0, zombieTypes.Count - 1);
 
             // Choose spawn point randomly.
             int spawnPoint = spawnPointChooser.Next(0, spawnPoints.Count - 1);
@@ -154,10 +141,5 @@ public class ZombieSpawner : MonoBehaviour
                 }
             }
         }
-    }
-
-    void ResetSpawner()
-    {
-
     }
 }
