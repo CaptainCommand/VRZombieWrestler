@@ -19,6 +19,14 @@ public class Health : MonoBehaviour
         }
     }
 
+    public float health
+    {
+        get
+        {
+            return healthCurrent;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -33,6 +41,8 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        healthCurrent -= damage;
+        if ((healthCurrent - damage) < 0.0f)
+            healthCurrent = 0.0f;
+        else healthCurrent -= damage;
     }
 }

@@ -29,7 +29,6 @@ public class Zombie : MonoBehaviour
     public float baseSpeed;
     public float acceleration;
     public float attackRange;
-    private bool isAttacking;
     public float damage;
     public float attackCooldown;
 
@@ -41,12 +40,8 @@ public class Zombie : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Get the animator component.
-        animator = GetComponent<Animator>();
-
         // Initialize health
         health = GetComponent<Health>();
-        isAttacking = false;
 
         // Get the animator component.
         animator = GetComponent<Animator>();
@@ -105,7 +100,7 @@ public class Zombie : MonoBehaviour
     IEnumerator AttackCoroutine()
     {
         // If the zombie is currently attacking.
-        while (isAttacking)
+        while (animator.GetBool("isAttacking"))
         {
             // Attack the player in range.
             player.GetComponent<Health>().TakeDamage(damage);
@@ -226,15 +221,13 @@ public class Zombie : MonoBehaviour
 
     public void Attack()
     {
-        isAttacking = true;
-        StartCoroutine(AttackCoroutine());
         animator.SetBool("isAttacking", true);
+        StartCoroutine(AttackCoroutine());  
     }
 
     public void StopAttack()
     {
         StopCoroutine(AttackCoroutine());
-        isAttacking = false;
         animator.SetBool("isAttacking", false);
     }
 }

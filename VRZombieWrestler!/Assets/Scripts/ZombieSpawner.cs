@@ -47,6 +47,9 @@ public class ZombieSpawner : MonoBehaviour
     // Random number generator to choose the next zombie type
     private System.Random zombieChooser;
 
+    // Zombie blood particle effect
+    public ParticleSystem bloodExplosion;
+
     // Use this for initialization
     void Start()
     {
@@ -56,14 +59,17 @@ public class ZombieSpawner : MonoBehaviour
         zombieScore = 0;
         zombieChooser = new System.Random();
         spawnPointChooser = new System.Random();
+    }
 
-        InvokeRepeating("SpawnZombie", spawnDelaySeconds, spawnDelaySeconds);
+    public void GameStart()
+    {
+        InvokeRepeating("SpawnZombie", 1.0f, spawnDelaySeconds);
     }
 
     // Update is called once per frame
     void Update()
     {
-
+ 
     }
 
     // Increases the max number of zombies spawned as well as the level.
@@ -79,7 +85,7 @@ public class ZombieSpawner : MonoBehaviour
         }
     }
 
-    void SpawnZombie()
+    void DestroyZombies()
     {
         // Remove any dead zombies from the scene
         zombies.RemoveAll(zombie => zombie.GetComponent<Health>().isDead == true);
@@ -90,6 +96,7 @@ public class ZombieSpawner : MonoBehaviour
                 GameObject zombieDying = zombies[index];
                 zombies.RemoveAt(index);
                 // TODO: Replace with effect or animation before destroy.
+                // StartCoroutine(DestroyZombieCoroutine(zombieDying));
                 Destroy(zombieDying);
                 totalScore++;
                 zombieScore++;
@@ -97,6 +104,26 @@ public class ZombieSpawner : MonoBehaviour
                 LevelUp();
             }
         }
+    }
+
+    IEnumerator DestroyZombieCoroutine(GameObject zombieDestroy)
+    {
+        ParticleSystem ps = Instantiate<ParticleSystem>(bloodExplosion, zombieDestroy.transform);
+        // If the zombie is currently attacking.
+        for (float time = 0; time < 5.0f; time++)
+        {
+            yield return new WaitForSeconds(1.0f);
+        }
+        Destroy(ps);
+        Destroy(zombieDestroy);
+
+        yield break;
+    }
+
+    void SpawnZombie()
+    {
+        // Destroy zombies
+        DestroyZombies();
 
         // Spawn a zombie if we are under the max number.
         if (zombies.Count < zombieMaxSpawnCount)
@@ -127,5 +154,10 @@ public class ZombieSpawner : MonoBehaviour
                 }
             }
         }
+    }
+
+    void ResetSpawner()
+    {
+
     }
 }

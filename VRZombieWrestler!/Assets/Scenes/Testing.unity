@@ -320,10 +320,12 @@ MonoBehaviour:
   - {fileID: 1906807989}
   - {fileID: 857824566}
   zombieScorePerLevel: 0
+  totalScore: 0
   zombieScore: 0
   zombieMaxSpawnCount: 4
   zombieMaxActiveCount: 2
   spawnDelaySeconds: 3
+  bloodExplosion: {fileID: 0}
 --- !u!4 &831791268
 Transform:
   m_ObjectHideFlags: 0
